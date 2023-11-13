@@ -40,7 +40,7 @@ class TaskController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        return $this->render('task/list.html.twig', [
+        return $this->render('tasks/list.html.twig', [
             'tasks' => $tasks,
         ]);
     }
@@ -72,6 +72,19 @@ class TaskController extends AbstractController
             'form' => $form->createView()
         ]);
  
+    }
+
+    #[Route('/delete/{id}', name: 'app_task_delete', requirements: ['id' => '\d+'])]
+    public function deleteTask(Task $task): Response
+    {
+        if(!$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $this->entityManager->remove($task);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_task_list');
     }
 
 

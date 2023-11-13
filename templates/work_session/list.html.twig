@@ -3,11 +3,28 @@
 {% block title %}Liste des sessions{% endblock %}
 
 {% block body %}
-    <h1>Liste des sessions</h1>
 
-    {% if 'ROLE_EMPLOYEE' in app.user.roles %}
-        <a href="{{ path('app_work_session_start') }}">Démarrer une nouvelle session</a>
-    {% endif %}
+    <header class="flex items-center justify-between py-4 border-b-2 border-solid border-slate-100 mb-5">
+        <h1 class="font-bold text-xl">Liste des sessions</h1>
+        
+        <div class="flex flex-row gap-5">
+            {% if 'ROLE_EMPLOYEE' in app.user.roles %}
+                {% if currentSession %}
+                    {% include 'components/button.html.twig' with {
+                        'text': 'Voir ma session en cours',
+                        'route': path('app_work_session_show', {'id': currentSession.id}),
+                        'icon': 'fas fa-eye',
+                    } %}
+                {% else %}
+                    {% include 'components/button.html.twig' with {
+                        'text': 'Démarer une session',
+                        'route': path('app_work_session_start'),
+                        'icon': 'fas fa-play',
+                    } %}
+                {% endif %}
+            {% endif %}
+        </div>
+    </header>
 
     <ul>
         {% for session in workSessions %}

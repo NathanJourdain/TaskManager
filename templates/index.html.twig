@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TaskManager{% endblock %}
+
+{% block body %}
+    <header class="flex items-center justify-between py-4 border-b-2 border-solid border-slate-100 mb-5">
+        <h1 class="font-bold text-2xl">Bonjour {{ app.user.firstname }} !</h1>
+        
+        <div class="flex flex-row gap-5">
+            {# {% if 'ROLE_EMPLOYEE' in app.user.roles %} #}
+                {# {% if currentSession %}
+                    {% include 'components/button.html.twig' with {
+                        'text': 'Voir ma session en cours',
+                        'route': path('app_work_session_show', {'id': currentSession.id}),
+                        'icon': 'fas fa-eye',
+                    } %}
+                {% else %}
+                    {% include 'components/button.html.twig' with {
+                        'text': 'Démarer une session',
+                        'route': path('app_work_session_start'),
+                        'icon': 'fas fa-play',
+                    } %}
+                {% endif %}
+            {% endif %} #}
+        </div>
+    </header>
+
+    <main class="grid grid-cols-2 gap-3">
+        <div class="bg-slate-50 rounded-md p-4 row-span-2">
+            <h2 class="text-xl font-bold mb-4">Tâche à réaliser</h2>
+
+            {% for task in tasks %}
+                <li class="mb-2 flex items-center justify-between p-2 bg-white rounded">
+                    <div>
+                        <span class="block">{{ task.title }}</span>
+                        {% if task.assignedTo %}
+                            <span class="text-xs text-gray-500">Assigné à <span class="underline">{{ task.assignedTo.firstname }}</span></span>
+                        {% else %}
+                            <span class="text-xs text-gray-500">Assigné à tout le monde</span>
+                        {% endif %}
+                    </div>
+                    
+                    {# Boutons éditions / suppresions pour les admins #}
+                    {% if 'ROLE_ADMIN' in app.user.roles %}
+                        <div class="flex flex-row gap-5">
+                            <a href="{{ path('app_task_delete', {id: task.id}) }}" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></a>
+                            <a href="{{ path('app_task_update', {id: task.id}) }}" class="text-blue-500 hover:text-blue-700"><i class="fas fa-edit"></i></a>
+                        </div>
+                    {% endif %}
+
+                </li>
+            {% endfor %}
+        
+        </div>
+        <div class="bg-slate-50 rounded-md p-4">
+            <h2 class="text-xl font-bold mb-4">Liste des sessions</h2>
+
+            <ul>
+                {% for session in workSessions %}
+                    {% if session.finish is null %}
+                        <li class="text-gray-700">Session en cours depuis {{ session.start|date('d/m/Y H:i:s') }} - <a href="{{ path('app_work_session_show', {'id': session.id}) }}" class="text-blue-500 hover:text-blue-700">Voir</a></li>
+                    {% else %}
+                        <li class="text-gray-700">Session de {{ session.duration|date("%hh %im %ss") }} le {{ session.start|date('d/m/Y') }} - <a href="{{ path('app_work_session_show', {'id': session.id}) }}" class="text-blue-500 hover:text-blue-700">Voir</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="bg-slate-50 rounded-md p-4">
+            <h2 class="text-xl font-bold mb-4">Liste des employés</h2>
+        </div>
+
+    </main>
+
+{% endblock %}

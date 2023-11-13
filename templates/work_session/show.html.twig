@@ -4,14 +4,21 @@
 
 {% block body %}
 
-    <header class="flex items-center justify-between p-4 bg-slate-100 rounded mb-5">
+    <header class="flex items-center justify-between py-4 border-b-2 border-solid border-slate-100 mb-5">
         <h1 class="font-bold text-xl">Détail de la session</h1>
         
-        {% include 'components/button.html.twig' with {
-            'text': 'Retour',
-            'route': path('app_work_session_list'),
-            'icon': 'fa-solid fa-bars-staggered'
-        } %}
+        <div class="flex flex-row gap-5">
+            {% include 'components/button.html.twig' with {
+                'text': 'Créer une tâche',
+                'route': path('app_task_create'),
+                'icon': 'fas fa-plus',
+            } %}
+            {% include 'components/button.html.twig' with {
+                'text': 'Liste des sessions',
+                'route': path('app_work_session_list'),
+                'icon': 'fas fa-list',
+            } %}
+        </div>
     </header>
 
     <section> {# section du status de la session #}
@@ -19,13 +26,13 @@
             'workSession': workSession,
         } %}
 
-        <div class="flex justify-center mt-5">
+        {% if workSession.finish is null %}
             {% include 'components/button.html.twig' with {
                 'text': 'Terminer la session',
                 'icon': 'fa-solid fa-check',
                 'route': path('app_work_session_finish', {'id': workSession.id})
             } %}
-        </div>
+        {% endif %}
     </section>
 
     <section class="mt-10"> {# Section des tâches #}

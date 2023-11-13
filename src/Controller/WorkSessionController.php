@@ -43,8 +43,11 @@ class WorkSessionController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
+        $currentSession = $this->workSessionRepository->getCurrentWorkSession($this->getUser());
+
         return $this->render('work_session/list.html.twig', [
             'workSessions' => $workSessions,
+            'currentSession' => $currentSession
         ]);
     }
 
