@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des tâches à réaliser{% endblock %}
+
+{% block body %}
+    <h1>Liste des tâches à réaliser</h1>
+
+    <ul>
+        {% for task in tasks %}
+            <li>
+                {{ task.title }}
+            </li>
+        {% else %}
+            <li>Aucune tâche à réaliser</li>
+        {% endfor %}
+    </ul>
+
+    {% if 'ROLE_ADMIN' in app.user.roles %}
+        <a href="{{ path('app_task_create') }}">Créer une tâche</a>
+    {% endif %}
+
+    <a href="{{ path('app_work_session_list') }}">Liste des sessions de travail</a>
+
+{% endblock %}

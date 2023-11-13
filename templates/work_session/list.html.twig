@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des sessions{% endblock %}
+
+{% block body %}
+    <h1>Liste des sessions</h1>
+
+    {% if 'ROLE_EMPLOYEE' in app.user.roles %}
+        <a href="{{ path('app_work_session_start') }}">Démarrer une nouvelle session</a>
+    {% endif %}
+
+    <ul>
+        {% for session in workSessions %}
+            {% if session.finish is null %}
+                <li>Session en cours depuis {{ session.start|date('d/m/Y H:i:s') }} - <a href="{{ path('app_work_session_show', {'id': session.id}) }}">Voir</a></li>
+            {% else %}
+                <li>Session de {{ session.duration|date("%hh %im %ss") }} le {{ session.start|date('d/m/Y') }} - <a href="{{ path('app_work_session_show', {'id': session.id}) }}">Voir</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+
+{% endblock %}

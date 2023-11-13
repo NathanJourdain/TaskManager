@@ -1,0 +1,71 @@
+<div id="countdown"class="bg-slate-50 py-4 px-10 rounded w-max mx-auto">
+    {% if workSession.finish is null %}
+        <h3 class="text-center text-2xl uppercase font-bold">Commencée il y a</h3>
+    {% else %}
+        <h3 class="text-center text-2xl uppercase font-bold">Durée de la session</h3>
+    {% endif %}
+	<ul class="text-center">
+		<li class="inline-block text-lg uppercase p-2">
+			<span class="text-4xl block" id="hours">0</span>Heures</li>
+		<li class="inline-block text-lg uppercase p-2">
+			<span class="text-4xl block" id="minutes">0</span>Minutes</li>
+		<li class="inline-block text-lg uppercase p-2">
+			<span class="text-4xl block" id="seconds">0</span>Secondes</li>
+	</ul>
+</div>
+
+{% block javascripts %}
+    {% if workSession.finish is null %}
+	<script>
+		function initCountdown() {
+            const second = 1000,
+            minute = second * 60,
+            hour = minute * 60;
+
+            const countDown = new Date({{ workSession.start|date('U') * 1000 }}).getTime();
+            
+            x = setInterval(function () {
+            
+            const now = new Date().getTime();
+            distance = now - countDown;
+
+            document.getElementById("hours").innerText = Math.floor(distance / (hour)),
+            document.getElementById("minutes").innerText = Math.floor((distance % (hour)) / (minute)),
+            document.getElementById("seconds").innerText = Math.floor((distance % (minute)) / second);
+
+        }, 0)
+    }
+    initCountdown();
+    </script>
+    {% else %}
+        <script>
+            function initCountdown() {
+                const second = 1000,
+                minute = second * 60,
+                hour = minute * 60;
+                
+                const start = new Date({{ workSession.start|date('U') * 1000 }}).getTime();
+                const finish = new Date({{ workSession.finish|date('U') * 1000 }}).getTime();
+
+                const duration = finish - start;
+                
+                let advance = 0;
+                
+                let intervalId = setInterval(function () {
+                    advance += 2000;
+
+                    advance = advance > duration ? duration : advance; // pour ne pas que ça dépasse
+
+                    document.getElementById("hours").innerText = Math.floor(advance / (hour)),
+                    document.getElementById("minutes").innerText = Math.floor((advance % (hour)) / (minute)),
+                    document.getElementById("seconds").innerText = Math.floor((advance % (minute)) / second);
+
+                    if (advance >= duration) {
+                        clearInterval(intervalId);
+                    }
+                }, 0)
+            }
+            setTimeout(initCountdown, 1000);
+        </script>
+    {% endif %}
+{% endblock %}
