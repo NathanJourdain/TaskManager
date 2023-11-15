@@ -30,13 +30,13 @@ class HomeController extends AbstractController
         // Récupération des données de l'utilisateur connecté suivant son rôle
         if($this->isGranted('ROLE_ADMIN')) {
             $workSessions = $this->workSessionRepository->findBy([], ['id' => 'DESC']);
-            $tasks = $this->taskRepository->findBy(['completed' => false]);
         }
         else if($this->isGranted('ROLE_EMPLOYEE')) {
             $workSessions = $this->workSessionRepository->findBy(['employee' => $this->getUser()], ['id' => 'DESC']);
-            $tasks = $this->taskRepository->findUserTasks($this->getUser());
             $currentSession = $this->workSessionRepository->getCurrentWorkSession($this->getUser());
         }
+
+        $tasks = $this->taskRepository->findUserTasks($this->getUser());
 
         return $this->render('index.html.twig', [
             'workSessions' => $workSessions,

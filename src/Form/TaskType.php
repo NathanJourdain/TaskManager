@@ -6,6 +6,7 @@ use App\Entity\Task;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,7 +18,8 @@ class TaskType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'Titre de la tâche'
+                'label' => 'Titre de la tâche',
+                'required' => true,
             ])
             ->add('assignedTo', EntityType::class, [
                 'label' => 'Assignée à',
@@ -30,9 +32,7 @@ class TaskType extends AbstractType
                 'class' => User::class,
                 'choice_label' => 'email',
                 'required' => false,
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Créer la tâche',
+                'placeholder' => 'Tout le monde',
             ])
         ;
     }

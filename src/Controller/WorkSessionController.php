@@ -28,29 +28,6 @@ class WorkSessionController extends AbstractController
         $this->taskRepository = $taskRepository;
     }
 
-    #[Route('', name: 'app_work_session_list')]
-    public function listSessions(): Response
-    {
-        if($this->isGranted('ROLE_ADMIN')) {
-            // Liste de toutes les sessions
-            $workSessions = $this->workSessionRepository->findBy([], ['id' => 'DESC']);
-        }
-        else if($this->isGranted('ROLE_EMPLOYEE')) {
-            // Liste de toutes les sessions de l'employé
-            $workSessions = $this->workSessionRepository->findBy(['employee' => $this->getUser()], ['id' => 'DESC']);
-        }
-        else {
-            throw $this->createAccessDeniedException();
-        }
-
-        $currentSession = $this->workSessionRepository->getCurrentWorkSession($this->getUser());
-
-        return $this->render('work_session/list.html.twig', [
-            'workSessions' => $workSessions,
-            'currentSession' => $currentSession
-        ]);
-    }
-
     #[Route('/start', name: 'app_work_session_start')]
     public function startSession(): Response
     {
@@ -62,7 +39,6 @@ class WorkSessionController extends AbstractController
         // Regarder si une session de travail est déjà en cours
         $currentSession = $this->workSessionRepository->getCurrentWorkSession($this->getUser());
 
-        
         // Si déjà une session en cours on redirige vers la session
         if($currentSession !== null) {
             return $this->redirectToRoute('app_work_session_show', ['id' => $currentSession->getId()]);
@@ -90,9 +66,9 @@ class WorkSessionController extends AbstractController
         // Regarder si une session de travail est en cours
         $currentSession = $this->workSessionRepository->getCurrentWorkSession($this->getUser());
         
-        // Si aucune session en cours on redirige vers la page d'accueil
+        // Si aucune session en cours on fait une erreur
         if($currentSession === null) {
-            return $this->redirectToRoute('app_task_list');
+            throw $this->createNotFoundException();
         }
         
         // Sinon on termine la session

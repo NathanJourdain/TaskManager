@@ -5,102 +5,99 @@
 {% block body %}
 
     <header class="flex items-center justify-between py-4 border-b-2 border-solid border-slate-100 mb-5">
-        <h1 class="font-bold text-xl">Détail de la session</h1>
-        
+        <h1 class="font-bold text-2xl">Détail de la session</h1>
+
         <div class="flex flex-row gap-5">
-            {% include 'components/button.html.twig' with {
-                'text': 'Créer une tâche',
-                'route': path('app_task_create'),
-                'icon': 'fas fa-plus',
-            } %}
-            {% include 'components/button.html.twig' with {
-                'text': 'Liste des sessions',
-                'route': path('app_work_session_list'),
-                'icon': 'fas fa-list',
+            {% include 'components/_button.html.twig' with {
+                'text': 'Tableau de bord',
+                'route': path('app_home'),
+                'icon': 'fas fa-home'
             } %}
         </div>
     </header>
 
-    <section> {# section du status de la session #}
-        {% include 'components/clock.html.twig' with {
-            'workSession': workSession,
-        } %}
-
-        {% if workSession.finish is null %}
-            {% include 'components/button.html.twig' with {
-                'text': 'Terminer la session',
-                'icon': 'fa-solid fa-check',
-                'route': path('app_work_session_finish', {'id': workSession.id})
+    <main class="grid grid-cols-1 gap-3">
+        {# Status #}
+        <section class="bg-slate-50 rounded-md p-4 row-span-2">
+            {% include 'components/_clock.html.twig' with {
+                'workSession': workSession,
             } %}
-        {% endif %}
-    </section>
 
-    <section class="mt-10"> {# Section des tâches #}
-        {% if workSession.finish is null %}
-            <section class="grid grid-cols-2 gap-10">
-                <div>
-                    <h2 class="text-xl font-bold mt-4 mb-2 sticky top-0 bg-white p-2">À faire</h2>
-                    <ul class="mt-2">
-                        {% for task in tasks %}
-                            <li class="mb-2 flex items-center p-2 bg-slate-50 rounded">
-                                <a href="{{ path('app_task_complete', {'id': task.id}) }}"
-                                class="text-xs border-2 border-blue-500 border-solid text-blue-500 hover:bg-blue-500 hover:text-white font-bold p-1 rounded flex items-center">
-                                    <i class="fas fa-check"></i>
-                                </a>
-                                <span class="ml-2">{{ task.title }}</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold mt-4 mb-2 sticky top-0 bg-white p-2">Tâches réalisées</h2>
-                    <ul>
-                        {% for task in workSession.completedTasks %}
-                            <li class="mb-2 flex items-center p-2 bg-slate-50 rounded">
-                                <span class="line-through">{{ task.title }}</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </section>
-        {% else %}
-            <h2 class="text-xl font-bold mt-4 mb-2 sticky top-0 bg-white p-2">Tâches réalisées ({{ workSession.completedTasks|length }})</h2>
-            <ul>
-                {% for task in workSession.completedTasks %}
-                    <li class="mb-2 flex items-center p-2 bg-slate-50 rounded">
-                        <span class="line-through">{{ task.title }}</span>
-                    </li>
+            {% if workSession.finish is null %}
+                {% include 'components/_button.html.twig' with {
+                    'text': 'Terminer la session',
+                    'icon': 'fa-solid fa-check',
+                    'route': path('app_work_session_finish', {'id': workSession.id})
+                } %}
+            {% endif %}
+        </section>
+
+        {# Tâches #}
+        <section class="bg-slate-50 rounded-md p-4 row-span-2"> 
+            {% if workSession.finish is null %}
+                <section class="grid grid-cols-2 gap-10">
+                    <div>
+                        <h2 class="text-xl font-bold mt-4 mb-2 sticky top-0 bg-white p-2">À faire</h2>
+                        <ul class="mt-2">
+                            {% for task in tasks %}
+                                <li class="mb-2 flex items-center p-2 bg-slate-50 rounded">
+                                    <a href="{{ path('app_task_complete', {'id': task.id}) }}"
+                                    class="text-xs border-2 border-blue-500 border-solid text-blue-500 hover:bg-blue-500 hover:text-white font-bold p-1 rounded flex items-center">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <span class="ml-2">{{ task.title }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold mt-4 mb-2 sticky top-0 p-2">Tâches réalisées</h2>
+                        <ul>
+                            {% for task in workSession.completedTasks %}
+                                <li class="mb-2 flex items-center p-2 bg-slate-50 rounded">
+                                    <span class="line-through">{{ task.title }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
+            {% else %}
+                <h2 class="text-xl font-bold mt-4 mb-2 sticky top-0 p-2">Tâches réalisées ({{ workSession.completedTasks|length }})</h2>
+                <ul>
+                    {% for task in workSession.completedTasks %}
+                        <li class="mb-2 flex items-center p-2 bg-slate-50 rounded">
+                            <span class="line-through">{{ task.title }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </section>
+
+        {# Commentaires #}
+        <section class="bg-slate-50 rounded-md p-4 row-span-2">
+            <h2 class="text-xl font-bold mt-4 mb-2">Commentaires ({{ workSession.comments|length }})</h2>
+                {% for comment in workSession.comments %}
+                    <div class="border p-2 mb-2">
+                        <p class="text-xs mb-1">De {{ comment.user.firstname }} le <time>{{ comment.date|date('d/m/Y à H:i') }}</time></p>
+                        <p>{{ comment.text }}</p>
+                    </div>
                 {% endfor %}
-            </ul>
-        {% endif %}
-    </section>
-
-
-    <section> {# Section des commentaires #}
-        <h2 class="text-xl font-bold mt-4 mb-2">Commentaires ({{ workSession.comments|length }})</h2>
-            {% for comment in workSession.comments %}
-                <div class="border p-2 mb-2">
-                    <p class="text-xs mb-1">De {{ comment.user.firstname }} le <time>{{ comment.date|date('d/m/Y à H:i') }}</time></p>
-                    <p>{{ comment.text }}</p>
-                </div>
-            {% endfor %}
-        </div>
-    
-        <h3 class="text-lg font-bold mt-4 mb-2">Ajouter un commentaire</h3>
-        <div class="mt-2">
-            {{ form_start(form) }}
-    
-            {{ form_widget(form) }}
-    
-            {% include 'components/button.html.twig' with {
-                'text': 'Ajouter',
-                'icon': 'fa-solid fa-plus',
-                'type': 'submit'
-            } %}
-    
-            {{ form_end(form) }}
-        </div>
-    </section>
-
-    
+            </div>
+        
+            <h3 class="text-lg font-bold mt-4 mb-2">Ajouter un commentaire</h3>
+            <div class="mt-2">
+                {{ form_start(form) }}
+        
+                {{ form_widget(form) }}
+        
+                {% include 'components/_button.html.twig' with {
+                    'text': 'Ajouter',
+                    'icon': 'fa-solid fa-plus',
+                    'type': 'submit'
+                } %}
+        
+                {{ form_end(form) }}
+            </div>
+        </section>
+    </main>
 {% endblock %}

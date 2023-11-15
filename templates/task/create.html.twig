@@ -1,11 +1,33 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des tâches à réaliser{% endblock %}
+{% block title %}Créer une tâche{% endblock %}
 
 {% block body %}
+    <header class="flex items-center justify-between py-4 border-b-2 border-solid border-slate-100 mb-5">
+        <h1 class="font-bold text-2xl">Création d'une tâche</h1>
 
-    <h1>Création d'une nouvelle tâche</h1>
+        <div class="flex flex-row gap-5">
+            {% include 'components/_button.html.twig' with {
+                'text': 'Tableau de bord',
+                'route': path('app_home'),
+                'icon': 'fas fa-home'
+            } %}
+        </div>
+    </header>
 
-    {{ form(form) }}
+    <main class="bg-slate-50 rounded-md p-4 row-span-2">
+        {{ form_start(form) }}
+
+        {{ form_widget(form) }}
+
+        {% include 'components/_button.html.twig' with {
+            'text': 'Ajouter',
+            'icon': 'fas fa-plus',
+            'type': 'submit',
+        } %}
+
+        {{ form_end(form) }}
+
+    </main>
 
 {% endblock %}

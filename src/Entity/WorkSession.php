@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: WorkSessionRepository::class)]
 class WorkSession
@@ -14,12 +15,15 @@ class WorkSession
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('work_session:read')]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups('work_session:read')]
     private ?\DateTimeInterface $start = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups('work_session:read')]
     private ?\DateTimeInterface $finish = null;
 
     #[ORM\ManyToOne]
@@ -81,10 +85,6 @@ class WorkSession
 
     public function getDuration(): ?\DateInterval
     {
-        if($this->start === null) {
-            return null;
-        }
-
         if($this->finish === null) {
             return null;
         }
