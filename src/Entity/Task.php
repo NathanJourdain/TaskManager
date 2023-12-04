@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TaskRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
@@ -20,10 +21,13 @@ class Task
     private ?User $assignedTo = null;
 
     #[ORM\Column]
-    private ?bool $completed = false;
+    private ?bool $enable = null;
 
-    #[ORM\ManyToOne(inversedBy: 'completedTasks')]
-    private ?WorkSession $workSession = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $lastCompletedAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $recurrence = null;
 
     public function getId(): ?int
     {
@@ -54,27 +58,40 @@ class Task
         return $this;
     }
 
-    public function isCompleted(): ?bool
+    public function isEnable(): ?bool
     {
-        return $this->completed;
+        return $this->enable;
     }
 
-    public function setCompleted(bool $completed): static
+    public function setEnable(bool $enable): static
     {
-        $this->completed = $completed;
+        $this->enable = $enable;
 
         return $this;
     }
 
-    public function getWorkSession(): ?WorkSession
+    public function getLastCompletedAt(): ?\DateTimeInterface
     {
-        return $this->workSession;
+        return $this->lastCompletedAt;
     }
 
-    public function setWorkSession(?WorkSession $workSession): static
+    public function setLastCompletedAt(?\DateTimeInterface $lastCompletedAt): static
     {
-        $this->workSession = $workSession;
+        $this->lastCompletedAt = $lastCompletedAt;
 
         return $this;
     }
+
+    public function getRecurrence(): ?int
+    {
+        return $this->recurrence;
+    }
+
+    public function setRecurrence(?int $recurrence): static
+    {
+        $this->recurrence = $recurrence;
+
+        return $this;
+    }
+
 }

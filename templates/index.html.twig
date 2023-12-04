@@ -5,14 +5,23 @@
 {% block body %}
     <header class="flex items-center justify-between py-4 border-b-2 border-solid border-slate-100 mb-5">
         <h1 class="font-bold text-2xl">Bonjour {{ app.user.firstname }} !</h1>
+
+        <div class="flex flex-row gap-5">
+            {% include 'components/_button.html.twig' with {
+                'text': 'Se déconnecter',
+                'route': path('app_logout'),
+                'icon': 'fas fa-sign-out-alt',
+            } %}
+        </div>
     </header>
 
-    <main class="grid grid-cols-2 gap-3 h-[80vh]">
+    <main class="grid grid-cols-1 gap-3 h-[80vh] lg:grid-cols-2">
         <div class="bg-slate-50 rounded-md row-span-2 h-full overflow-auto shadow-md">
 
-            <div class="flex flex-row justify-between sticky top-0 bg-slate-50 p-4 items-center">
-                <h2 class="text-xl font-bold">Tâche à réaliser</h2>
+            <div class="flex flex-row justify-between sticky top-0 bg-slate-50 p-4 items-center items-center z-10">
+                <h2 class="text-xl font-bold">Tâches à réaliser</h2>
 
+                <div>
                 {% if 'ROLE_ADMIN' in app.user.roles %}
                     {% include 'components/_button.html.twig' with {
                         'text': 'Ajouter une tâche',
@@ -20,11 +29,13 @@
                         'icon': 'fas fa-plus',
                     } %}
                 {% endif %}
+                </div>
             </div>
 
             <ul class="p-4 flex flex-col gap-2">
             {% for task in tasks %}
-                <li class="flex items-center justify-between p-2 bg-white rounded h-full overflow-auto">
+                <li class="relative flex items-center justify-between p-2 bg-white rounded h-full shadow-sm">
+                    
                     <div>
                         <span class="block">{{ task.title }}</span>
                         {% if task.assignedTo %}
@@ -36,6 +47,13 @@
                     
                     {% if 'ROLE_ADMIN' in app.user.roles %}
                         <div class="flex flex-row gap-5">
+                            {% if task.enable %}
+                                <a href="{{ path('app_task_disable', {id: task.id}) }}" class="text-green-500 hover:text-green-700"><i class="fa-solid fa-toggle-on"></i></a>
+                            {% else %}
+                                <a href="{{ path('app_task_enable', {id: task.id}) }}" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-toggle-off"></i></a>
+                            {% endif %}
+
+
                             <a href="{{ path('app_task_delete', {id: task.id}) }}" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></a>
                             <a href="{{ path('app_task_update', {id: task.id}) }}" class="text-blue-500 hover:text-blue-700"><i class="fas fa-edit"></i></a>
                         </div>
@@ -52,6 +70,7 @@
                 <h2 class="text-xl font-bold">Liste des sessions</h2>
 
                 {% if 'ROLE_EMPLOYEE' in app.user.roles %}
+                    <div>
                     {% if currentSession is null %}
                         {% include 'components/_button.html.twig' with {
                             'text': 'Commencer une session',
@@ -65,13 +84,14 @@
                             'icon': 'fas fa-eye',
                         } %}
                     {% endif %}
+                    </div>
                 {% endif %}
 
             </div>
             
             <ul class="p-4 flex flex-col gap-3">
             {% for session in workSessions %}
-                <li class="flex items-center justify-between p-2 bg-white rounded">
+                <li class="flex items-center justify-between p-2 bg-white rounded shadow-sm">
                     <div>
                         {% if session.finish is null %}
                             <span class="block">Session en cours</span>
@@ -92,79 +112,19 @@
             </ul>
         </div>
 
-        {% if 'ROLE_ADMIN' in app.user.roles %}
-        <div class="bg-slate-50 rounded-md shadow-md">
-            <div class="flex flex-row justify-between sticky top-0 bg-slate-50 p-4 items-center">
-                <h2 class="text-xl font-bold">Liste des employés</h2>
-            </div>
-
-            <ul class="p-4 flex flex-col gap-3"></ul>
-        </div>
-        {% endif %}
-
         {% if 'ROLE_EMPLOYEE' in app.user.roles %}
-        <div class="bg-slate-50 rounded-md">
+        <div class="bg-slate-50 rounded-md shadow-md">
             <div class="flex flex-row justify-between sticky top-0 bg-slate-50 p-4 items-center">
                 <h2 class="text-xl font-bold">Temps de travail</h2>
             </div>
 
-            <div id="barchart_values" class="w-full p-4">
-              <canvas id="myChart" class="w-full"></canvas>
+            <div class="p-4 flex flex-col gap-3">
+            TODO
             </div>
+
         </div>
         {% endif %}
 
     </main>
 
-{% endblock %}
-
-{% block javascripts %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script type="text/javascript">
-    addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('myChart');
-
-        // {"id":11,"start":"2023-11-15T10:48:16+00:00","finish":"2023-11-15T10:52:19+00:00"}
-        const workSessions = {{ workSessions|serialize('json', { groups: 'work_session:read'})|raw }};
-
-        // Fait un tableau avec le nombre d'heures travaillées par mois
-        let hoursByMonth = [];
-        for(let i = 0; i < 11; i++) {
-            hoursByMonth.push(0);
-        }
-
-        workSessions.forEach(session => {
-            const start = new Date(session.start);
-            const finish = new Date(session.finish);
-
-            const month = start.getMonth();
-            const duration = finish - start;
-
-            const durationInHours = duration / 1000 / 60 / 60;
-
-            hoursByMonth[month-1] += durationInHours;
-            
-        });
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-            labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Novembre', 'Décembre'], 
-            datasets: [{
-                label: 'Nombres d\'heures travaillées par mois',
-                data: hoursByMonth,
-                borderWidth: 1
-            }]
-            },
-            options: {
-            scales: {
-                y: {
-                beginAtZero: true
-                }
-            }
-            }
-        }); 
-    })
-    </script>
 {% endblock %}

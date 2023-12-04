@@ -43,6 +43,7 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()) {
+            $task->setEnable(true);
             $this->entityManager->persist($task);
             $this->entityManager->flush();
 
@@ -68,7 +69,7 @@ class TaskController extends AbstractController
         return $this->redirectToRoute('app_home');
     }
 
-
+    
     #[Route('/{id}/complete', name: 'app_task_complete', requirements: ['id' => '\d+'])]
     public function completeTask(Task $task): Response
     {
@@ -87,12 +88,48 @@ class TaskController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $task->setWorkSession($currentSession);
-        $task->setCompleted(true);
+        $currentSession->addCompletedTask($task);
+        $task->setLastCompletedAt(new \DateTime());
+
+        if($task->getRecurrence() == null) {
+            $task->setEnable(false);
+        }
 
         $this->entityManager->flush();
 
         $currentSession = $this->workSessionRepository->getCurrentWorkSession($this->getUser());
         return $this->redirectToRoute('app_work_session_show', ['id' => $currentSession->getId()]);
+    }
+
+    #[Route('/{id}/enable', name: 'app_task_enable', requirements: ['id' => '\d+'])]
+    public function disableTask(Task $task): Response
+    {
+        if(!$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $task->setEnable(true);
+
+        // Si pas de récurrance alors on remet la date de dernière complétion à null pour que la tâche soit affiché à nouveau
+        if($task->getRecurrence() === null) {
+            $task->setLastCompletedAt(null);
+        }
+        
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_home');
+    }
+
+    #[Route('/{id}/disable', name: 'app_task_disable', requirements: ['id' => '\d+'])]
+    public function enableTask(Task $task): Response
+    {
+        if(!$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $task->setEnable(false);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_home');
     }
 }

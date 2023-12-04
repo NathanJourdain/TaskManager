@@ -18,31 +18,33 @@
 
     <main class="grid grid-cols-1 gap-3">
         {# Status #}
-        <section class="bg-slate-50 rounded-md p-4 row-span-2">
+        <section class="bg-slate-50 rounded-md p-4 row-span-2 shadow-md">
             {% include 'components/_clock.html.twig' with {
                 'workSession': workSession,
             } %}
 
-            {% if workSession.finish is null %}
-                {% include 'components/_button.html.twig' with {
-                    'text': 'Terminer la session',
-                    'icon': 'fa-solid fa-check',
-                    'route': path('app_work_session_finish', {'id': workSession.id})
-                } %}
-            {% endif %}
+            <div class="text-center">
+                {% if workSession.finish is null %}
+                    {% include 'components/_button.html.twig' with {
+                        'text': 'Terminer la session',
+                        'icon': 'fa-solid fa-check',
+                        'route': path('app_work_session_finish', {'id': workSession.id})
+                    } %}
+                {% endif %}
+            </div>
         </section>
 
         {# Tâches #}
-        <section class="bg-slate-50 rounded-md p-4 row-span-2"> 
+        <section class="bg-slate-50 rounded-md p-4 row-span-2 shadow-md"> 
             {% if workSession.finish is null %}
                 <section class="grid grid-cols-2 gap-10">
                     <div>
-                        <h2 class="text-xl font-bold mt-4 mb-2 sticky top-0 bg-white p-2">À faire</h2>
+                        <h2 class="text-xl font-bold mt-4 mb-2 sticky top-0 p-2">À faire</h2>
                         <ul class="mt-2">
-                            {% for task in tasks %}
+                            {% for task in tasks|filter(t => workSession.completedTasks.contains(t) == false) %}
                                 <li class="mb-2 flex items-center p-2 bg-slate-50 rounded">
                                     <a href="{{ path('app_task_complete', {'id': task.id}) }}"
-                                    class="text-xs border-2 border-blue-500 border-solid text-blue-500 hover:bg-blue-500 hover:text-white font-bold p-1 rounded flex items-center">
+                                    class="text-xs border-2 border-blue-600 border-solid text-blue-600 hover:bg-blue-600 hover:text-white font-bold p-1 rounded flex items-center">
                                         <i class="fas fa-check"></i>
                                     </a>
                                     <span class="ml-2">{{ task.title }}</span>
@@ -74,7 +76,7 @@
         </section>
 
         {# Commentaires #}
-        <section class="bg-slate-50 rounded-md p-4 row-span-2">
+        <section class="bg-slate-50 rounded-md p-4 row-span-2 shadow-md">
             <h2 class="text-xl font-bold mt-4 mb-2">Commentaires ({{ workSession.comments|length }})</h2>
                 {% for comment in workSession.comments %}
                     <div class="border p-2 mb-2">

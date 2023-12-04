@@ -2,7 +2,7 @@
 
 {% block title %}Register{% endblock %}
 
-{% block body %}
+{# {% block body %}
     {% for flash_error in app.flashes('verify_email_error') %}
         <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
     {% endfor %}
@@ -22,4 +22,48 @@
 
         <button type="submit" class="btn">Register</button>
     {{ form_end(registrationForm) }}
+{% endblock %} #}
+
+
+{% block body %}
+	<section>
+		<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
+			<div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
+				<div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+					<h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
+						Création d'un compte
+					</h1>
+    
+                    {% for flash_error in app.flashes('verify_email_error') %}
+                        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+                    {% endfor %}
+                    
+                    {{ form_start(registrationForm) }}
+                        {{ form_row(registrationForm.email, {
+                            attr: {
+                                autofocus: true,
+                            }
+                        }) }}
+                        {{ form_row(registrationForm.firstname) }}
+                        {{ form_row(registrationForm.lastname) }}
+                        {{ form_row(registrationForm.plainPassword) }}
+                    
+                        {% include 'components/_button.html.twig' with {
+                            'text': 'Créer un compte',
+                            'type': 'submit',
+                        } %}
+
+                    {{ form_end(registrationForm) }}
+
+						<p class="text-sm font-light text-gray-500 dark:text-gray-400">
+							Vous avez déjà un compte ?
+							<a href="{{ path('app_login') }}" class="font-medium text-blue-600 hover:underline dark:text-blue-500">
+                                Connectez-vous
+                            </a>
+						</p>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
 {% endblock %}

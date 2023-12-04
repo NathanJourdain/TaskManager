@@ -27,18 +27,23 @@ class TaskRepository extends ServiceEntityRepository
    /**
     * @return Task[] Returns an array of Task objects
     */
-   public function findUserTasks(User $user): array
+   public function findUserTasks(User $user, bool $onlyTodo = true): array
    {
         $query = $this->createQueryBuilder('t');
 
-        // regarder si l'utilisateur est un admin
+        // regarder si l'utilisateur est un employé
         if(in_array('ROLE_EMPLOYEE', $user->getRoles())) {
             $query->andWhere('t.assignedTo = :user OR t.assignedTo IS NULL')
-                ->setParameter('user', $user);
+                ->setParameter('user', $user)
+                ->andWhere('t.enable = true');
+        }
+        
+        if($onlyTodo){
+            $query->andWhere('t.lastCompletedAt IS NULL OR :now >= DATE_ADD(t.lastCompletedAt, t.recurrence, \'day\')')
+                ->setParameter('now', new \DateTime());
         }
 
-        $query->andWhere('t.completed = false')
-            ->orderBy('t.id', 'ASC');
+        $query->orderBy('t.id', 'ASC');
 
         return $query->getQuery()
                 ->getResult();

@@ -33,13 +33,14 @@ class WorkSession
     #[ORM\OneToMany(mappedBy: 'workSession', targetEntity: WorkSessionComment::class, orphanRemoval: true)]
     private Collection $comments;
 
-    #[ORM\OneToMany(mappedBy: 'workSession', targetEntity: Task::class)]
+    #[ORM\ManyToMany(targetEntity: Task::class)]
     private Collection $completedTasks;
 
     public function __construct()
     {
         $this->comments = new ArrayCollection();
         $this->completedTasks = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -134,7 +135,6 @@ class WorkSession
     {
         if (!$this->completedTasks->contains($completedTask)) {
             $this->completedTasks->add($completedTask);
-            $completedTask->setWorkSession($this);
         }
 
         return $this;
@@ -142,12 +142,7 @@ class WorkSession
 
     public function removeCompletedTask(Task $completedTask): static
     {
-        if ($this->completedTasks->removeElement($completedTask)) {
-            // set the owning side to null (unless already changed)
-            if ($completedTask->getWorkSession() === $this) {
-                $completedTask->setWorkSession(null);
-            }
-        }
+        $this->completedTasks->removeElement($completedTask);
 
         return $this;
     }

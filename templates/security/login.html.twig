@@ -1,31 +1,50 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Log in!
+{% endblock %}
 
 {% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+	<section>
+		<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
+			<div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
+				<div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+					<h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
+						Connexion à son compte
+					</h1>
+    
+                    {% if error %}
+                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+                    
+					<form class="space-y-4 md:space-y-6" method="post">
+						<div>
+							<label for="email" class="block mb-2 text-sm font-medium text-gray-900">Votre adresse mail</label>
+							<input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5" placeholder="name@company.com" required autofocus>
+						</div>
+						<div>
+							<label for="password" class="block mb-2 text-sm font-medium text-gray-900">Votre mot de passe</label>
+							<input type="password" name="password" id="password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5" required>
+						</div>
 
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
-        </div>
-    {% endif %}
+						<div>
+							<a href="#" class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">Mot de passe oublié ?</a>
+						</div>
 
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                        
+						{% include 'components/_button.html.twig' with {
+                            'text': 'Me connecter',
+							'type': 'submit',
+                        } %}
+						
 
-    <input type="hidden" name="_csrf_token"
-           value="{{ csrf_token('authenticate') }}"
-    >
-
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
-</form>
+						<p class="text-sm font-light text-gray-500 dark:text-gray-400">
+							Vous n'avez pas de compte ?
+							<a href="{{ path('app_register') }}" class="font-medium text-blue-600 hover:underline dark:text-blue-500">Créer un compte</a>
+						</p>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
 {% endblock %}

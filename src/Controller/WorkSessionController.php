@@ -90,7 +90,7 @@ class WorkSessionController extends AbstractController
         }
 
         $tasks = $this->taskRepository->findUserTasks($this->getUser());
-
+        
         $comment = new WorkSessionComment;
         $form = $this->createForm(WorkSessionCommentType::class, $comment);
         $form->handleRequest($request);

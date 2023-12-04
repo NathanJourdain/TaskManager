@@ -68,13 +68,12 @@ class AppFixtures extends Fixture
             // On lui donne un titre
             $task->setTitle($faker->sentence(3, true));
 
-            // On lui donne un statut
-            $task->setCompleted($faker->boolean(20));
-
             if($t % 2 == 0) {
                 // On lui donne un utilisateur 1 fois sur 2
                 $task->setAssignedTo($faker->randomElement($users));
             }
+
+            $task->setEnable($faker->boolean(70));
 
             // On fait persister les données
             $manager->persist($task);
